@@ -1,22 +1,27 @@
 import { CircularProgress, ClickAwayListener, Stack, Typography } from "@mui/material";
 import clsx from "clsx";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import SearchIcon from '@mui/icons-material/Search';
-import { useResponsive } from "@/utils/Responsive";
+import { useResponsive } from "@/utils/responsive";
 import SearchTextfield from "@/shared-components/inputs/TextField";
 import { Close } from "@mui/icons-material";
+import SearchMovie from "./SearchMovie";
+import * as  tmdbService from '@/services/tmdb/tmdb-services';
+import { IMovie } from "@/interfaces/IMovie";
+import { IArtist } from "@/interfaces/IArtist";
+
+
 
 const SearchController = () => {
 
 
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [containerAnchorEl, setContainerAnchorEl] = useState<null | HTMLElement>(null);
-    const [focusedElementIndex, setFocusedElementIndex] = useState<number | null>(null);
-    const [showMoreTabIndex, setShowMoreTabIndex] = useState<number | undefined>(undefined);
-    const [selectedSection, setSelectedSection] = useState<string>("");
     const [searchedKey, setSearchedKey] = useState<string>('');
+    const [searchedMovies, setSearchedMovies] = useState<IMovie[]>([] as IMovie[]);
+    const [searchedMoviesByPerson, setSearchedMoviesByPerson] = useState<IArtist[]>([] as IArtist[]);
 
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
     const { isMobile } = useResponsive();
 
@@ -25,14 +30,9 @@ const SearchController = () => {
     const searchInputRef = useRef<HTMLInputElement>(null);
 
 
-
-
     const closeSearchPopover = () => {
         setAnchorEl(null);
-        setContainerAnchorEl(null);
         if (searchInputRef.current) {
-            // searchInputRef.current.value = '';
-            setFocusedElementIndex(null);
             searchInputRef.current?.blur();
 
         };
@@ -46,14 +46,28 @@ const SearchController = () => {
 
     const openSearchPopover = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
-        setContainerAnchorEl(event.currentTarget);
-        setFocusedElementIndex(null);
-        setShowMoreTabIndex(undefined);
-        setSelectedSection('company');
     };
 
     const onChangeTextBoxHandler = (searchKey: string) => {
         setSearchedKey(searchKey);
+
+    }
+
+    useEffect(() => {
+        getSearchedData();
+    }, [searchedKey])
+
+
+    const getSearchedData = async () => {
+        setIsSearching(true);
+        const data = await tmdbService.searchMovieByActorOrTitle(searchedKey.split(" "));
+
+        const searchedMovies = data.data?.results?.filter((item: IMovie | IArtist) => item.media_type === 'movie');
+        const searchedMoviesByPerson = data.data?.results?.filter((item: IMovie | IArtist) => item.media_type === 'person');
+
+        setSearchedMovies(searchedMovies);
+        setSearchedMoviesByPerson(searchedMoviesByPerson);
+        setIsSearching(false);
     }
 
     const closeSearchMenu = () => {
@@ -70,7 +84,7 @@ const SearchController = () => {
             <div className={clsx(`md:!flex block flex-shrink md:relative md:!bottom-0 items-center justify-center`)}>
 
                 <div className={clsx(`z-[370] transition-width md:flex ${isPopupOpen ? 'flex' : 'hidden'}`,
-                    { 'w-full': ((isMobile)), 'w-[300px]': (!isPopupOpen), 'md:!w-[500px] w-full': (isPopupOpen) })}>
+                    { 'w-full': ((isMobile)), 'w-[300px]': (!isPopupOpen), 'md:!w-[830px] w-full': (isPopupOpen) })}>
 
                     <ClickAwayListener
                         onClickAway={closeSearchPopover}
@@ -78,7 +92,6 @@ const SearchController = () => {
                         touchEvent="onTouchStart"
                     >
                         <div
-                            id='openSearchPopOverId'
                             onClick={(event) => openSearchPopover(event)}
                             className="w-full"
                         >
@@ -98,22 +111,34 @@ const SearchController = () => {
                                     /> : null
                                 }
 
-                                // onKeyDown={onTextFieldKeyDownHandler}
-                                // searchInputRef={searchInputRef}
                                 isPopupOpen={isPopupOpen}
                                 closeSearchMenu={closeSearchMenu}
-                                // selectedValue={(fromOpportunity || toOpportunity) ? (fromOpportunity?.title ?? toOpportunity?.title) : ''}
                                 placeholder={"Search movies"}
                                 inputPropsClassName={`w-full border-[0px] [&>fieldset]:!border-blue-600
                                     ${isPopupOpen ? 'bg-white z-[2560]' : ''} transition-width transition-slowest ease`}
                                 searchCallBack={onChangeTextBoxHandler}
                                 debounce={500}
-                                isGlobalSearch={true}
-                                // isSearchDropdown={isSearchDropdown}
                                 searchedKey={searchedKey}
                             />
 
+                            <div className={`md:w-[830px] w-full ${(isMobile) ? 'absolute' : 'fixed'} mt-1 z-[2560] `}>
+                                {
+                                    (searchedKey && isPopupOpen) &&
+                                    <SearchMovie
+                                        closeSearchMenu={closeSearchMenu}
+                                        closeSearchPopover={closeSearchPopover}
+                                        isLoading={isSearching}
+                                        searchedMovies={searchedMovies}
+                                        searchedMoviesByPerson={searchedMoviesByPerson}
+                                        searchInputRef={searchInputRef}
+                                        setSearchedKey={setSearchedKey}
+
+                                    />
+                                }
+                            </div>
+
                         </div>
+
                     </ClickAwayListener>
                 </div>
 

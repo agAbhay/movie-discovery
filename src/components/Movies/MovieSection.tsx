@@ -10,6 +10,7 @@ import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import MovieCardSkeleton from '@/shared-components/CardSkeleton';
 import { useUtils } from '@/utils/Utils';
+import { useRouter } from 'next/navigation';
 
 interface IMovieSection {
     isLoading: boolean
@@ -58,11 +59,17 @@ const MovieSection: React.FC<IMovieSection> = (props) => {
     const { movieList, isLoading, sectionTitle } = props;
 
     const { getRandomCount } = useUtils();
-
+    const router = useRouter();
 
     const settings = useMemo(() => getSettings(movieList, movieList?.results?.length > 0), [movieList]);
 
     const skeletonCount = useMemo(() => getRandomCount(), [])
+
+
+    const goToPage = (id: number) => {
+        router.push(`/movie/${id}`);
+    };
+
 
     return (
         <Stack direction={'column'}>
@@ -80,10 +87,13 @@ const MovieSection: React.FC<IMovieSection> = (props) => {
                             :
                             movieList?.results?.map((movie, index) => {
                                 return (
-                                    <MovieCard
-                                        movie={movie}
-                                        key={`${index}nowPlayingMovies`}
-                                    />
+
+                                    <div onClick={() => goToPage(movie.id)}>
+                                        <MovieCard
+                                            movie={movie}
+                                            key={`${index}nowPlayingMovies`}
+                                        />
+                                    </div>
                                 )
                             })
                     }

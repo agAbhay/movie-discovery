@@ -4,6 +4,9 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 First, run the development server:
 
+take clone and run cmd:  npm i 
+then to run the app , run cmd: npm run dev
+
 ```bash
 npm run dev
 # or

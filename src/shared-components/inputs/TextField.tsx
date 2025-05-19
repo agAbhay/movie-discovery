@@ -3,8 +3,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { styled } from "@mui/material/styles";
 import { CircularProgress, InputAdornment, TextField } from "@mui/material";
-import { useResponsive } from '@/utils/Responsive';
 import _ from 'lodash';
+import { useResponsive } from '@/utils/responsive';
+
+
 
 const textFieldClassName = 'text-sm [&>label]:text-sm [&>span]:text-sm !mt-0';
 
@@ -18,12 +20,9 @@ interface ISearchTextfieldProps {
     startIcon?: React.ReactNode
     endIcon?: React.ReactNode
     isLoading?: boolean
-    isSearchingCompany?: boolean
     onFocus?: React.FocusEventHandler<HTMLInputElement> | undefined
     onKeyDown?(e: React.KeyboardEvent<HTMLDivElement>): void
     searchInputRef?: React.RefObject<HTMLInputElement>
-    isGlobalSearch?: boolean
-    isSearchDropdown?: boolean
     isPopupOpen?: boolean
     closeSearchMenu?(): void | undefined
     dataTestId?: string
@@ -33,8 +32,8 @@ interface ISearchTextfieldProps {
 
 const SearchTextfield: React.FC<ISearchTextfieldProps> = (props) => {
 
-    const { placeholder, searchedKey, variant = 'outlined', isSearchingCompany, isSearchDropdown = false, isPopupOpen = false, closeSearchMenu,
-        inputPropsClassName, className, debounce, searchCallBack, startIcon, endIcon, isLoading, onKeyDown, onFocus, searchInputRef, isGlobalSearch, dataTestId = 'search.global',
+    const { placeholder, searchedKey, variant = 'outlined', isPopupOpen = false, closeSearchMenu,
+        inputPropsClassName, className, debounce, searchCallBack, startIcon, endIcon, isLoading, onKeyDown, onFocus, searchInputRef, dataTestId = 'search.global',
         autoFocus
     } = props;
 
@@ -67,7 +66,7 @@ const SearchTextfield: React.FC<ISearchTextfieldProps> = (props) => {
 
     // it sets the shrink state to false to handle the mui outlined textbox
     const onBlurSearchBoxHandler = (event: any) => {
-        if (event.target.value.length === 0)
+        if (event.target.value?.length === 0)
             setIsShrink(false);
     }
 
@@ -89,7 +88,7 @@ const SearchTextfield: React.FC<ISearchTextfieldProps> = (props) => {
                 autoComplete='off'
                 autoFocus={autoFocus}
                 size={(isMobile) ? 'medium' : 'small'}
-                className={`${className} ${textFieldClassName} ${(isSearchDropdown ? true : isShrink) ? '[&>label]:pl-5 [&>label]:pr-3' : '[&>label]:pl-7'} `}
+                className={`${className} ${textFieldClassName} ${(isShrink) ? '[&>label]:pl-5 [&>label]:pr-3' : '[&>label]:pl-7'} `}
                 margin="dense"
                 id="outlined-basic"
                 data-testid={dataTestId}
@@ -97,8 +96,7 @@ const SearchTextfield: React.FC<ISearchTextfieldProps> = (props) => {
                 name='text'
                 inputRef={searchInputRef}
                 variant={variant}
-                InputLabelProps={{ shrink: isSearchDropdown ? false : isShrink, className: `${(isSearchDropdown && isMobile) ? '-top-[7px]' : ''}` }}
-                // label={(isSearchDropdown ? true : !isShrink) ? placeholder : ''}
+                InputLabelProps={{ shrink: isShrink, className: `${(isMobile) ? '-top-[7px]' : ''}` }}
                 placeholder={placeholder}
                 value={searchKey}
                 onKeyDown={e => {
@@ -126,14 +124,13 @@ const SearchTextfield: React.FC<ISearchTextfieldProps> = (props) => {
                             {endIcon}
                         </div> : null),
 
-                    className: `${inputPropsClassName}  [&>input]:px-1 ${!isSearchingCompany ? '[&>input]:pb-[8px] [&>input]:pt-2' : '[&>input]:pb-[6px] [&>input]:pt-1'} text-[14px]`,
-                    // disableUnderline: disableUnderline
+                    className: `${inputPropsClassName}  [&>input]:px-1 [&>input]:pb-[6px] [&>input]:pt-1 text-[14px]`,
                 }}
             />
             {
                 closeSearchMenu &&
                 <div
-                    className={`fixed w-full h-full md:!top-0 top-[63px] left-0 bg-gray-900 transition-color duration-200 flex !ml-0 ${isPopupOpen? 'opacity-50': 'opacity-0 pointer-events-none'}`}
+                    className={`fixed w-full h-full md:!top-0 top-[63px] left-0 bg-gray-900 transition-color duration-200 flex !ml-0 ${isPopupOpen ? 'opacity-50' : 'opacity-0 pointer-events-none'}`}
                     onClick={(e) => {
                         e.stopPropagation();
                         closeSearchMenu();

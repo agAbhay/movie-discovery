@@ -6,3 +6,17 @@ export interface IMovieData {
     total_pages: number
     total_results: number
 }
+
+
+export interface ICast {
+  id: number;
+  name: string;
+  character: string;
+  profile_path: string | null;
+}
+
+export interface IVideo {
+  key: string;
+  type: string;
+  site: string;
+}

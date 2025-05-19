@@ -1,0 +1,7 @@
+{
+  "id": 550,
+  "title": "Fight Club",
+  "overview": "An insomniac office worker...",
+  "genres": [{ "id": 18, "name": "Drama" }],
+  "poster_path": "/image.jpg"
+}

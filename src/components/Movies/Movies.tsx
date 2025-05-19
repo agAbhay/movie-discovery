@@ -23,8 +23,6 @@ const Movies: React.FC<IMovies> = (props) => {
     const { nowPlayingMovies, isNowPlayingDataLoading, onClickGenreHandler, currentSelectedGenreMovieList, isGenreDataLoading } = props;
 
 
-
-
     const buttons: IButton[] = useMemo(() => [
         { label: 'Feel Good', genreIds: [35, 10749, 18], onClick: onClickGenreHandler },
         { label: 'Action Fix', genreIds: [28], onClick: onClickGenreHandler },

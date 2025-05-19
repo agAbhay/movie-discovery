@@ -35,7 +35,7 @@ const ButtonsGroup: React.FC<IButtonsGroup> = (props) => {
                             setSelectedButtonId(btn.label)
                         }}
                         label={btn.label}
-                        buttonStyle={`whitespace-nowrap  ${selectedButtonId === btn.label ? "!bg-blue-900" : ''} `}
+                        buttonStyle={`whitespace-nowrap !px-10 ${selectedButtonId === btn.label ? "!bg-blue-900" : ''} `}
 
                     />
                 ))}
